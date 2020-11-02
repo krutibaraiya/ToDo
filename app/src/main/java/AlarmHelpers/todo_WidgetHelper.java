@@ -10,19 +10,19 @@ import com.example.todo.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import Adapters.ListItemTaskAdapter;
-import Objects.TaskObject;
+import Adapters.todo_ListItemTaskAdapter;
+import Objects.todo_TaskObject;
 
-public class WidgetHelper extends AppWidgetProvider {
+public class todo_WidgetHelper extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 
         RemoteViews view = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        List<TaskObject> taskObjectsList = new ArrayList<>();
+        List<todo_TaskObject> taskObjectsList = new ArrayList<>();
 
-        ListItemTaskAdapter adapter = new ListItemTaskAdapter(context, R.layout.item_task, taskObjectsList);
+        todo_ListItemTaskAdapter adapter = new todo_ListItemTaskAdapter(context, R.layout.item_task, taskObjectsList);
 
         appWidgetManager.updateAppWidget(appWidgetIds[0], view);
 

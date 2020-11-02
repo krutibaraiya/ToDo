@@ -1,6 +1,6 @@
 package Database;
 
-public interface BaseDatabase {
+public interface todo_BaseDatabase {
     int VERSION = 1;
     String DATABASE_NAME = "todo.db";
     String LISTS_TABLE = "lists";

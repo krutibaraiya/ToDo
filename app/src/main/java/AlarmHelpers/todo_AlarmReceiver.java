@@ -7,58 +7,56 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.util.Log;
-import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-import com.example.todo.DueToday;
-import com.example.todo.ListActivity;
+import com.example.todo.todo_DueToday;
+import com.example.todo.todo_ListActivity;
 import com.example.todo.R;
 
 
 import java.util.Calendar;
 
-import Database.BaseDatabase;
-import Database.DatabaseManager;
-import Objects.Reminder;
+import Database.todo_BaseDatabase;
+import Database.DatabaseManagerTodo;
+import Objects.todo_Reminder;
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class todo_AlarmReceiver extends BroadcastReceiver {
     AlarmManager mAlarmManager;
     PendingIntent mPendingIntent;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        int listID = Integer.parseInt(intent.getStringExtra(BaseDatabase.TASKS_PARENT_ID));
+        int listID = Integer.parseInt(intent.getStringExtra(todo_BaseDatabase.TASKS_PARENT_ID));
 
 
         // check if daily alarm for dueToday is received
-        if (listID == BaseDatabase.TODAY_ID) {
+        if (listID == todo_BaseDatabase.TODAY_ID) {
             daily_due_today_notification(context);
             return;
         }
 
 
         // get taskID and Reminder(taskID)
-        DatabaseManager db = new DatabaseManager(context);
-        int taskID = Integer.parseInt(intent.getStringExtra(BaseDatabase.REMINDERS_TASK_ID));
-        Reminder reminder = db.getReminder(taskID);
+        DatabaseManagerTodo db = new DatabaseManagerTodo(context);
+        int taskID = Integer.parseInt(intent.getStringExtra(todo_BaseDatabase.REMINDERS_TASK_ID));
+        todo_Reminder reminder = db.getReminder(taskID);
 
 
         // creating intent to open ListActivity on clicking the notification
-        Intent editIntent = new Intent(context, ListActivity.class);
-        editIntent.putExtra(BaseDatabase.TASKS_PARENT_ID, listID);
+        Intent editIntent = new Intent(context, todo_ListActivity.class);
+        editIntent.putExtra(todo_BaseDatabase.TASKS_PARENT_ID, listID);
         PendingIntent mClick = PendingIntent.getActivity(context, reminder.getTaskID(), editIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         //creating intent for action button | mark as done
-        Intent actionIntent = new Intent(context, NotificationActionReceiver.class);
+        Intent actionIntent = new Intent(context, todo_NotificationActionReceiver.class);
         actionIntent.putExtra("ACTION", "mark_as_done");
-        actionIntent.putExtra(BaseDatabase.TASKS_ID, taskID + "");
+        actionIntent.putExtra(todo_BaseDatabase.TASKS_ID, taskID + "");
         PendingIntent actionPendingIntent = PendingIntent.getBroadcast(context, taskID, actionIntent, 0);
 
 
@@ -96,24 +94,24 @@ public class AlarmReceiver extends BroadcastReceiver {
         db.hasBeenNotified(taskID);
     }
 
-    public void setAlarm(Context context, Reminder reminder, int listID) {
+    public void setAlarm(Context context, todo_Reminder reminder, int listID) {
 
-        if (listID == BaseDatabase.TODAY_ID) {
+        if (listID == todo_BaseDatabase.TODAY_ID) {
             mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
-            Intent intent = new Intent(context, AlarmReceiver.class);
-            intent.putExtra(BaseDatabase.REMINDERS_TASK_ID, reminder.getTaskID() + "");
-            intent.putExtra(BaseDatabase.TASKS_PARENT_ID, listID + "");
+            Intent intent = new Intent(context, todo_AlarmReceiver.class);
+            intent.putExtra(todo_BaseDatabase.REMINDERS_TASK_ID, reminder.getTaskID() + "");
+            intent.putExtra(todo_BaseDatabase.TASKS_PARENT_ID, listID + "");
 
             Calendar c = Calendar.getInstance();
             c.set(Calendar.HOUR_OF_DAY, 7);
             c.set(Calendar.MINUTE, 0);
             c.set(Calendar.SECOND, 0);
 
-            mPendingIntent = PendingIntent.getBroadcast(context, BaseDatabase.TODAY_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mPendingIntent = PendingIntent.getBroadcast(context, todo_BaseDatabase.TODAY_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             mAlarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), AlarmManager.INTERVAL_DAY, mPendingIntent);
 
-            ComponentName receiver = new ComponentName(context, AlarmHelpers.BootReceiver.class);
+            ComponentName receiver = new ComponentName(context, todo_BootReceiver.class);
             PackageManager pm = context.getPackageManager();
             pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
 
@@ -125,9 +123,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Put Reminder ID in Intent Extra
-        Intent intent = new Intent(context, AlarmReceiver.class);
-        intent.putExtra(BaseDatabase.REMINDERS_TASK_ID, reminder.getTaskID() + "");
-        intent.putExtra(BaseDatabase.TASKS_PARENT_ID, listID + "");
+        Intent intent = new Intent(context, todo_AlarmReceiver.class);
+        intent.putExtra(todo_BaseDatabase.REMINDERS_TASK_ID, reminder.getTaskID() + "");
+        intent.putExtra(todo_BaseDatabase.TASKS_PARENT_ID, listID + "");
         mPendingIntent = PendingIntent.getBroadcast(context, reminder.getTaskID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Log.e("NOTIF: ", "3");
@@ -137,7 +135,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.e("NOTIF: ", "4");
         // Restart alarm if device is rebooted
-        ComponentName receiver = new ComponentName(context, AlarmHelpers.BootReceiver.class);
+        ComponentName receiver = new ComponentName(context, todo_BootReceiver.class);
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
@@ -146,11 +144,11 @@ public class AlarmReceiver extends BroadcastReceiver {
         mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 
         // Cancel Alarm using Reminder ID
-        mPendingIntent = PendingIntent.getBroadcast(context, taskID, new Intent(context, AlarmReceiver.class), 0);
+        mPendingIntent = PendingIntent.getBroadcast(context, taskID, new Intent(context, todo_AlarmReceiver.class), 0);
         mAlarmManager.cancel(mPendingIntent);
 
         // Disable alarm
-        ComponentName receiver = new ComponentName(context, BootReceiver.class);
+        ComponentName receiver = new ComponentName(context, todo_BootReceiver.class);
         PackageManager pm = context.getPackageManager();
         pm.setComponentEnabledSetting(receiver,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -162,12 +160,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.e("DAILY-ALARM", "");
 
         // creating intent to open ListActivity on clicking the notification
-        Intent editIntent = new Intent(context, DueToday.class);
+        Intent editIntent = new Intent(context, todo_DueToday.class);
         PendingIntent mClick = PendingIntent.getActivity(context, 0, editIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         // get number of tasks due today
-        int dueTodayTasks = new DatabaseManager(context).getNumberOfTasksDueToday();
+        int dueTodayTasks = new DatabaseManagerTodo(context).getNumberOfTasksDueToday();
 
 
         //create RemoteViews for custom notification layout
@@ -189,7 +187,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.e("NOTIF: ", "8");
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         builder.setContentIntent(mClick);
-        notificationManager.notify(BaseDatabase.TODAY_ID, builder.build());
+        notificationManager.notify(todo_BaseDatabase.TODAY_ID, builder.build());
     }
 
 }

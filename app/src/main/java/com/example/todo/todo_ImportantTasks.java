@@ -17,21 +17,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import Adapters.ListItemTaskAdapter;
-import Database.DatabaseManager;
-import Objects.TaskObject;
+import Adapters.todo_ListItemTaskAdapter;
+import Database.DatabaseManagerTodo;
+import Objects.todo_TaskObject;
 
-public class DueTomorrow extends AppCompatActivity {
+public class todo_ImportantTasks extends AppCompatActivity {
 
-    List<TaskObject> tasksList;
+    List<todo_TaskObject> tasksList;
 
     RecyclerView tasksRecycler;
-    ListItemTaskAdapter tasksAdapter;
+    todo_ListItemTaskAdapter tasksAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_due_tomorrow);
+        setContentView(R.layout.activity_important_tasks);
 
         Slidr.attach(this);
 
@@ -43,10 +43,10 @@ public class DueTomorrow extends AppCompatActivity {
     private void assignUIcomponents() {
         tasksList = new ArrayList<>();
 
-        tasksRecycler = findViewById(R.id.dueTomorrow_tasks_recycler);
+        tasksRecycler = findViewById(R.id.impTasks_tasks_recycler);
         tasksRecycler.setLayoutManager(new LinearLayoutManager(getBaseContext(), RecyclerView.VERTICAL, false));
 
-        tasksAdapter = new ListItemTaskAdapter(getBaseContext(), R.layout.item_task, tasksList);
+        tasksAdapter = new todo_ListItemTaskAdapter(getBaseContext(), R.layout.item_task, tasksList);
         tasksRecycler.setAdapter(tasksAdapter);
 
         new ItemTouchHelper(swipeToDeleteCallback).attachToRecyclerView(tasksRecycler);
@@ -56,33 +56,31 @@ public class DueTomorrow extends AppCompatActivity {
 
         Calendar c = Calendar.getInstance();
 
-        c.add(Calendar.DAY_OF_YEAR, 1);
+        int month = c.get(Calendar.MONTH) + 1;
 
-        String date = c.get(Calendar.DAY_OF_MONTH) + "-" + (c.get(Calendar.MONTH)+1) + "-" + c.get(Calendar.YEAR);
+        String date = c.get(Calendar.DAY_OF_MONTH) + "-" + month + "-" + c.get(Calendar.YEAR);
 
-        DatabaseManager db = new DatabaseManager(getApplicationContext());
-        Cursor cursor = db.getTasksDueToday(date);
+        DatabaseManagerTodo db = new DatabaseManagerTodo(getApplicationContext());
+        Cursor cursor = db.getImportantTasks();
 
-        TaskObject task;
+        todo_TaskObject task;
 
         if (cursor.moveToFirst()) {
             do {
                 // your code like get columns
-                task = new TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
+                task = new todo_TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
                 task.setID(cursor.getInt(0));
                 task.setMarkedImportant("1".equals(cursor.getString(6)));
-                task.setDate("0");
-                task.setTime("0");
+                task.setDate(cursor.getString(4));
+                task.setTime(cursor.getString(5));
                 tasksList.add(task);
-                Log.e("LOOPING", "123456...");
             }
             while (cursor.moveToNext());
         }
 
         Log.e("tasks size", "today_size: " + tasksList.size());
         if (tasksList.size() > 0) {
-            findViewById(R.id.dueTomorrow_hooray).setVisibility(View.GONE);
-            findViewById(R.id.dueTomorrow_no_due_today_static_text).setVisibility(View.GONE);
+            findViewById(R.id.impTasks_no_imp_tasks_static_text).setVisibility(View.GONE);
             tasksAdapter.notifyDataSetChanged();
         }
     }
@@ -95,10 +93,10 @@ public class DueTomorrow extends AppCompatActivity {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            DatabaseManager db = new DatabaseManager(getBaseContext());
+            DatabaseManagerTodo db = new DatabaseManagerTodo(getBaseContext());
             db.removeTask(tasksList.get(viewHolder.getAdapterPosition()).getID());
             tasksList.remove(viewHolder.getAdapterPosition());
-            tasksAdapter.notifyItemRemoved(viewHolder.getPosition());
+            tasksAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
         }
     };
 }

@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -26,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,17 +38,17 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import Adapters.ListItemTaskAdapter;
-import Adapters.ThemeChangerAdapter;
-import AlarmHelpers.AlarmReceiver;
-import Database.BaseDatabase;
-import Database.DatabaseManager;
-import Objects.ConstantsDB;
-import Objects.Reminder;
-import Objects.TaskObject;
-import Objects.ThemeObject;
+import Adapters.todo_ListItemTaskAdapter;
+import Adapters.todo_ThemeChangerAdapter;
+import AlarmHelpers.todo_AlarmReceiver;
+import Database.todo_BaseDatabase;
+import Database.DatabaseManagerTodo;
+import Objects.todo_ConstantsDB;
+import Objects.todo_Reminder;
+import Objects.todo_TaskObject;
+import Objects.todo_ThemeObject;
 
-public class ListActivity extends AppCompatActivity {
+public class todo_ListActivity extends AppCompatActivity {
 
     private Intent intent;
     private static Context mContext;
@@ -59,13 +57,13 @@ public class ListActivity extends AppCompatActivity {
     private static CollapsingToolbarLayout collapsingToolbar;
 
     private RecyclerView tasksRecycler;
-    private ListItemTaskAdapter tasksListAdapter;
+    private todo_ListItemTaskAdapter tasksListAdapter;
 
     private static ImageView parentBackground;
     private static ImageView floatingButton;
 
     private static int themeRes, listID;
-    private List<TaskObject> taskObjectList = new ArrayList<>();
+    private List<todo_TaskObject> taskObjectList = new ArrayList<>();
     private static String date = "0", time = "0";
 
     @Override
@@ -84,7 +82,7 @@ public class ListActivity extends AppCompatActivity {
 
         intent = getIntent();
 
-        listID = intent.getIntExtra(BaseDatabase.TASKS_PARENT_ID, 1);
+        listID = intent.getIntExtra(todo_BaseDatabase.TASKS_PARENT_ID, 1);
 
         assignUIcomponents();
 
@@ -109,8 +107,8 @@ public class ListActivity extends AppCompatActivity {
                 break;
 
             case R.id.todos_delete_list:
-                new DatabaseManager(getBaseContext()).removeListAndChildTasks(listID);
-                HomePage.listDeleted(listID);
+                new DatabaseManagerTodo(getBaseContext()).removeListAndChildTasks(listID);
+                todo_HomePage.listDeleted(listID);
                 finish();
                 break;
         }
@@ -128,7 +126,7 @@ public class ListActivity extends AppCompatActivity {
         collapsingToolbar.setTitle(intent.getStringExtra("title"));
 
         // load theme name from database using ID from intentExtra and set it as background
-        DatabaseManager db = new DatabaseManager(ListActivity.this);
+        DatabaseManagerTodo db = new DatabaseManagerTodo(todo_ListActivity.this);
         String theme = db.getListTheme(listID);
         themeRes = getResources().getIdentifier(theme, "drawable", getApplicationContext().getPackageName());
         parentBackground = findViewById(R.id.todos_parentBackground);
@@ -149,7 +147,7 @@ public class ListActivity extends AppCompatActivity {
         tasksRecycler.setLayoutManager(new LinearLayoutManager(getBaseContext(), RecyclerView.VERTICAL, false));
 
         // setup Adapter for Recycler View
-        tasksListAdapter = new ListItemTaskAdapter(this, R.layout.item_task, taskObjectList);
+        tasksListAdapter = new todo_ListItemTaskAdapter(this, R.layout.item_task, taskObjectList);
         tasksRecycler.setAdapter(tasksListAdapter);
 
         // swipe to delete for Recycler View
@@ -157,13 +155,13 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void loadTasksFromDatabase() {
-        DatabaseManager db = new DatabaseManager(getBaseContext());
+        DatabaseManagerTodo db = new DatabaseManagerTodo(getBaseContext());
         Cursor cursor = db.getAllTasksUnderList(listID);
 
-        TaskObject task;
+        todo_TaskObject task;
 
         while (cursor.moveToNext()) {
-            task = new TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
+            task = new todo_TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
             task.setMarkedImportant("1".equals(cursor.getString(6)));
             task.setID(cursor.getInt(0));
             task.setDate(cursor.getString(4));
@@ -175,9 +173,9 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public void change_theme_popup() {
-        view_change_theme = LayoutInflater.from(ListActivity.this).inflate(R.layout.popup_theme_change, null);
+        view_change_theme = LayoutInflater.from(todo_ListActivity.this).inflate(R.layout.popup_theme_change, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(todo_ListActivity.this);
         builder.setView(view_change_theme);
 
         AlertDialog alertDialog = builder.create();
@@ -190,7 +188,7 @@ public class ListActivity extends AppCompatActivity {
         window.setAttributes(wlp);
 
         RecyclerView themeChangeRecycler = view_change_theme.findViewById(R.id.list_theme_change_recycler);
-        themeChangeRecycler.setLayoutManager(new LinearLayoutManager(ListActivity.this, LinearLayoutManager.HORIZONTAL, false));
+        themeChangeRecycler.setLayoutManager(new LinearLayoutManager(todo_ListActivity.this, LinearLayoutManager.HORIZONTAL, false));
         ((SimpleItemAnimator) themeChangeRecycler.getItemAnimator()).setSupportsChangeAnimations(false);
 
         themeChangeRecycler.setHasFixedSize(true);
@@ -198,7 +196,7 @@ public class ListActivity extends AppCompatActivity {
         themeChangeRecycler.setDrawingCacheEnabled(true);
         themeChangeRecycler.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_LOW);
 
-        ThemeChangerAdapter adapter = new ThemeChangerAdapter(ListActivity.this, R.layout.list_theme_selector, ConstantsDB.getThemeObjectsList());
+        todo_ThemeChangerAdapter adapter = new todo_ThemeChangerAdapter(todo_ListActivity.this, R.layout.list_theme_selector, todo_ConstantsDB.getThemeObjectsList());
         themeChangeRecycler.setAdapter(adapter);
 
         int currentThemePosition = adapter.selectCurrentTheme(themeRes);
@@ -210,9 +208,9 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public void add_task_popup() {
-        view_add_task = LayoutInflater.from(ListActivity.this).inflate(R.layout.popup_add_todo_task, null);
+        view_add_task = LayoutInflater.from(todo_ListActivity.this).inflate(R.layout.popup_add_todo_task, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(todo_ListActivity.this);
         builder.setView(view_add_task);
 
         final AlertDialog dialog = builder.create();
@@ -265,9 +263,9 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void date_time_popup(final TextView dateTimeTextView, final TextView clearDueDate) {
-        final View view_datetime_popup = LayoutInflater.from(ListActivity.this).inflate(R.layout.date_time_picker, null);
+        final View view_datetime_popup = LayoutInflater.from(todo_ListActivity.this).inflate(R.layout.date_time_picker, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(todo_ListActivity.this);
         builder.setView(view_datetime_popup);
 
         final AlertDialog dialog = builder.create();
@@ -346,7 +344,7 @@ public class ListActivity extends AppCompatActivity {
 
         View view_rename_list = LayoutInflater.from(getBaseContext()).inflate(R.layout.popup_rename_list, null);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(todo_ListActivity.this);
         builder.setView(view_rename_list);
 
         AlertDialog alertDialog = builder.create();
@@ -382,10 +380,10 @@ public class ListActivity extends AppCompatActivity {
                     //do nothing
                 } else {
                     //update new title in database
-                    DatabaseManager db = new DatabaseManager(getBaseContext());
+                    DatabaseManagerTodo db = new DatabaseManagerTodo(getBaseContext());
                     db.renameList(listID, renameList.getText().toString().trim());
                     db.close();
-                    HomePage.refreshTitle(listID, renameList.getText().toString().trim());
+                    todo_HomePage.refreshTitle(listID, renameList.getText().toString().trim());
                 }
             }
         });
@@ -393,7 +391,7 @@ public class ListActivity extends AppCompatActivity {
 
     private void add_task_to_database(String taskDescription) {
         if (!taskDescription.isEmpty()) {
-            TaskObject task = new TaskObject(taskDescription, false, Boolean.parseBoolean(time));
+            todo_TaskObject task = new todo_TaskObject(taskDescription, false, Boolean.parseBoolean(time));
 
             String[] dateData = date.split("-");
             String[] timeData = time.split(":");
@@ -409,7 +407,7 @@ public class ListActivity extends AppCompatActivity {
                 task.setMinute(Integer.parseInt(timeData[1]));
             }
 
-            DatabaseManager db = new DatabaseManager(getBaseContext());
+            DatabaseManagerTodo db = new DatabaseManagerTodo(getBaseContext());
             int taskID = db.AddTaskToDatabase(taskDescription, false, listID, date, time);
             task.setID(taskID);
 
@@ -426,10 +424,10 @@ public class ListActivity extends AppCompatActivity {
         time = "0";
     }
 
-    private void setAlarm(TaskObject task) {
-        Reminder reminder = new Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription());
+    private void setAlarm(todo_TaskObject task) {
+        todo_Reminder reminder = new todo_Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription());
 
-        new AlarmReceiver().setAlarm(getBaseContext(), reminder, listID);
+        new todo_AlarmReceiver().setAlarm(getBaseContext(), reminder, listID);
         Log.e("NOTIF: ", "1");
     }
 
@@ -442,8 +440,8 @@ public class ListActivity extends AppCompatActivity {
         themeRes = imageRes;
         parentBackground.setImageResource(imageRes);
 
-        int accentPrimary = mContext.getResources().getColor(new ThemeObject(themeRes, false).getPrimaryAccentForTheme());
-        int accentSecondary =  mContext.getResources().getColor(new ThemeObject(themeRes, false).getSecondaryAccentForTheme());
+        int accentPrimary = mContext.getResources().getColor(new todo_ThemeObject(themeRes, false).getPrimaryAccentForTheme());
+        int accentSecondary =  mContext.getResources().getColor(new todo_ThemeObject(themeRes, false).getSecondaryAccentForTheme());
         collapsingToolbar.setCollapsedTitleTextColor(accentPrimary);
         collapsingToolbar.setExpandedTitleColor(accentPrimary);
 
@@ -460,10 +458,10 @@ public class ListActivity extends AppCompatActivity {
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            DatabaseManager db = new DatabaseManager(getBaseContext());
+            DatabaseManagerTodo db = new DatabaseManagerTodo(getBaseContext());
             db.removeTask(taskObjectList.get(viewHolder.getAdapterPosition()).getID());
             db.close();
-            new AlarmReceiver().cancelAlarm(getBaseContext(), taskObjectList.get(viewHolder.getAdapterPosition()).getID());
+            new todo_AlarmReceiver().cancelAlarm(getBaseContext(), taskObjectList.get(viewHolder.getAdapterPosition()).getID());
             taskObjectList.remove(viewHolder.getAdapterPosition());
             tasksListAdapter.notifyItemRemoved(viewHolder.getPosition());
         }

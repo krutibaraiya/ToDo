@@ -12,15 +12,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import AlarmHelpers.AlarmReceiver;
-import Objects.Reminder;
-import Objects.TaskObject;
+import AlarmHelpers.todo_AlarmReceiver;
+import Objects.todo_Reminder;
+import Objects.todo_TaskObject;
 
-public class DatabaseManager extends SQLiteOpenHelper implements BaseDatabase{
+public class DatabaseManagerTodo extends SQLiteOpenHelper implements todo_BaseDatabase {
 
     Context context;
 
-    public DatabaseManager(@Nullable Context context) {
+    public DatabaseManagerTodo(@Nullable Context context) {
         super(context, DATABASE_NAME, null, VERSION);
         this.context = context;
     }
@@ -103,7 +103,7 @@ public class DatabaseManager extends SQLiteOpenHelper implements BaseDatabase{
 
         if(System.currentTimeMillis() - cal.getTimeInMillis() > 0){
             values.put(TASKS_IS_NOTIF_PENDING, "1");
-            new AlarmReceiver().setAlarm(context, getReminder(taskID), getListIDfromTaskID(taskID));
+            new todo_AlarmReceiver().setAlarm(context, getReminder(taskID), getListIDfromTaskID(taskID));
         }
 
         this.getWritableDatabase().update(TASKS_TABLE, values, "ID = " + taskID, null);
@@ -114,22 +114,22 @@ public class DatabaseManager extends SQLiteOpenHelper implements BaseDatabase{
         return db.rawQuery("select * from " + LISTS_TABLE, null);
     }
 
-    public List<Reminder> getPendingReminders() {
-        List<Reminder> reminderList = new ArrayList<>();
-        TaskObject task;
+    public List<todo_Reminder> getPendingReminders() {
+        List<todo_Reminder> reminderList = new ArrayList<>();
+        todo_TaskObject task;
 
         Cursor cursor = this.getWritableDatabase().rawQuery("SELECT * FROM " + TASKS_TABLE + " WHERE ISNOTIFICATIONPENDIND = 1", null);
 
         if (cursor.moveToFirst()) {
             do {
-                task = new TaskObject(cursor.getString(cursor.getColumnIndex(TASKS_DESCRIPTION)),
+                task = new todo_TaskObject(cursor.getString(cursor.getColumnIndex(TASKS_DESCRIPTION)),
                         "1".equals(cursor.getString(cursor.getColumnIndex(TASKS_IS_FINISHED))),
                         true);
                 task.setMarkedImportant("1".equals(cursor.getString(6)));
                 task.setID(cursor.getInt(0));
                 task.setDate(cursor.getString(4));
                 task.setTime(cursor.getString(5));
-                reminderList.add(new Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription()));
+                reminderList.add(new todo_Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription()));
             } while (cursor.moveToNext());
         }
         return reminderList;
@@ -162,17 +162,17 @@ public class DatabaseManager extends SQLiteOpenHelper implements BaseDatabase{
         return this.getWritableDatabase().rawQuery("SELECT * FROM " + TASKS_TABLE + " WHERE ISIMPORTANT=? AND ISFINISHED=?", new String[] {"1", "0"});
     }
 
-    public Reminder getReminder(int taskID){
+    public todo_Reminder getReminder(int taskID){
         Cursor cursor = this.getWritableDatabase().rawQuery("SELECT * FROM " + TASKS_TABLE + " WHERE ID = " + taskID, null);
         cursor.moveToNext();
 
-        TaskObject task = new TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
+        todo_TaskObject task = new todo_TaskObject(cursor.getString(1), "1".equals(cursor.getString(2)), "1".equals(cursor.getString(4)));
         task.setMarkedImportant("1".equals(cursor.getString(6)));
         task.setID(cursor.getInt(0));
         task.setDate(cursor.getString(4));
         task.setTime(cursor.getString(5));
 
-        return new Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription());
+        return new todo_Reminder(task.getID(), task.getDay(), task.getMonth(), task.getYear(), task.getHour(), task.getMinute(), task.getTaskDescription());
     }
 
     public int getListIcon(int listID){

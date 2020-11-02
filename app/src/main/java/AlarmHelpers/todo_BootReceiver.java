@@ -6,10 +6,10 @@ import android.content.Intent;
 import android.util.Log;
 
 import java.util.List;
-import Database.DatabaseManager;
-import Objects.Reminder;
+import Database.DatabaseManagerTodo;
+import Objects.todo_Reminder;
 
-public class BootReceiver extends BroadcastReceiver {
+public class todo_BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -19,12 +19,12 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
 
             Log.e("BOOT_TODO", "Boot Receiver OnReceive triggered!");
-            DatabaseManager db = new DatabaseManager(context);
-            AlarmReceiver alarmReceiver = new AlarmReceiver();
+            DatabaseManagerTodo db = new DatabaseManagerTodo(context);
+            todo_AlarmReceiver alarmReceiver = new todo_AlarmReceiver();
 
-            List<Reminder> reminders = db.getPendingReminders();
+            List<todo_Reminder> reminders = db.getPendingReminders();
 
-            for (Reminder rm : reminders) {
+            for (todo_Reminder rm : reminders) {
                 // Cancel existing notification of the reminder by using its ID
                 alarmReceiver.cancelAlarm(context, rm.getTaskID());
 

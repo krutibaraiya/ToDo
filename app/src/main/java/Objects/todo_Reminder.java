@@ -2,15 +2,15 @@ package Objects;
 
 import java.util.Calendar;
 
-public class Reminder {
+public class todo_Reminder {
 
     int taskID;
     int day, month, year, hour, minute;     //month is indexed from 1   i.e. 1-12
     String taskDescription;
 
-    public Reminder(){}
+    public todo_Reminder(){}
 
-    public Reminder(int taskID, int day, int month, int year, int hour, int minute, String taskDescription){
+    public todo_Reminder(int taskID, int day, int month, int year, int hour, int minute, String taskDescription){
         this.taskID = taskID;
         this.day = day;
         this.month = month;

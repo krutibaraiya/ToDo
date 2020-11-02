@@ -13,7 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 
-public class AddUsername extends AppCompatActivity {
+public class todo_AddUsername extends AppCompatActivity {
 
     private ImageView todoIconStatic;
     private EditText username;
@@ -39,7 +39,7 @@ public class AddUsername extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences("user_data", MODE_PRIVATE);
         String username = "";
         if(!prefs.getString("username", "").equals("")){
-            Intent intent = new Intent(AddUsername.this, HomePage.class);
+            Intent intent = new Intent(todo_AddUsername.this, todo_HomePage.class);
             startActivity(intent);
             finish();
         }
@@ -69,7 +69,7 @@ public class AddUsername extends AppCompatActivity {
                 if (!username.getText().toString().equals("")) {
                     SharedPreferences prefs = getSharedPreferences("user_data", MODE_PRIVATE);
                     prefs.edit().putString("username", username.getText().toString().trim()).apply();
-                    Intent intent = new Intent(AddUsername.this, HomePage.class);
+                    Intent intent = new Intent(todo_AddUsername.this, todo_HomePage.class);
                     startActivity(intent);
                     finish();
                 }

@@ -1,6 +1,6 @@
 package Objects;
 
-public class ListObject {
+public class todo_ListObject {
 
     private int id;
     private int icon;
@@ -18,7 +18,7 @@ public class ListObject {
     }
 
     //constructor
-    public ListObject(int id, String name, int icon, boolean isGroup){
+    public todo_ListObject(int id, String name, int icon, boolean isGroup){
         this.id = id;
         this.name = name;
         this.icon = icon;

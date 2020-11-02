@@ -2,13 +2,13 @@ package Objects;
 
 import com.example.todo.R;
 
-public class ThemeObject {
+public class todo_ThemeObject {
 
     private int imageRes;
 
     private boolean isSelected = false;
 
-    public ThemeObject(int imageRes, boolean isSelected) {
+    public todo_ThemeObject(int imageRes, boolean isSelected) {
         this.imageRes = imageRes;
         this.isSelected = isSelected;
     }

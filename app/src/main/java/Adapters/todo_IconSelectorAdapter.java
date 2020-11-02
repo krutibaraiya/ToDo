@@ -9,31 +9,29 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todo.HomePage;
+import com.example.todo.todo_HomePage;
 import com.example.todo.R;
 
 import java.util.List;
 
-import Objects.ThemeObject;
-
-public class IconSelectorAdapter extends RecyclerView.Adapter<IconSelectorAdapter.ViewHolder> {
+public class todo_IconSelectorAdapter extends RecyclerView.Adapter<todo_IconSelectorAdapter.ViewHolder> {
 
     private List<String> icons;
     private int resource;
     private Context context;
 
-    public IconSelectorAdapter(Context context, int resource, List<String> icons){
+    public todo_IconSelectorAdapter(Context context, int resource, List<String> icons){
         this.context = context;
         this.resource = resource;
         this.icons = icons;
 
-        HomePage.setSelectedIcon(icons.get(30));
+        todo_HomePage.setSelectedIcon(icons.get(30));
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new IconSelectorAdapter.ViewHolder(LayoutInflater.from(context).inflate(resource, parent, false));
+        return new todo_IconSelectorAdapter.ViewHolder(LayoutInflater.from(context).inflate(resource, parent, false));
     }
 
     @Override
@@ -43,7 +41,7 @@ public class IconSelectorAdapter extends RecyclerView.Adapter<IconSelectorAdapte
         holder.icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HomePage.setSelectedIcon(icons.get(position));
+                todo_HomePage.setSelectedIcon(icons.get(position));
             }
         });
     }

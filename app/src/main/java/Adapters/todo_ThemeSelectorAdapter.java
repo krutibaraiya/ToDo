@@ -9,41 +9,44 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todo.HomePage;
-import com.example.todo.ListActivity;
+import com.example.todo.todo_HomePage;
 import com.example.todo.R;
 
 import java.util.List;
 
-import Database.DatabaseManager;
-import Objects.ThemeObject;
+import Objects.todo_ThemeObject;
 
-public class ThemeChangerAdapter extends RecyclerView.Adapter<ThemeChangerAdapter.ViewHolder> {
+public class todo_ThemeSelectorAdapter extends RecyclerView.Adapter<todo_ThemeSelectorAdapter.ViewHolder> {
 
-    private List<ThemeObject> images;
+    private List<todo_ThemeObject> images;
     private int resource;
     private Context context;
 
     private int selectedPosition;
-    private int ID;
 
-    public ThemeChangerAdapter(Context context, int resource, List<ThemeObject> images){
+    public todo_ThemeSelectorAdapter(Context context, int resource, List<todo_ThemeObject> images){
         this.context = context;
         this.resource = resource;
         this.images = images;
+
+        //default selected theme
+        selectedPosition = 0;
+        todo_HomePage.setSelectedTheme(images.get(selectedPosition).getImageRes());
+        this.images.get(selectedPosition).setSelected(true);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ThemeChangerAdapter.ViewHolder(LayoutInflater.from(context).inflate(resource, parent, false));
+        return new todo_ThemeSelectorAdapter.ViewHolder(LayoutInflater.from(context).inflate(resource, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         holder.image.setImageResource(images.get(position).getImageRes());
 
         if(images.get(position).isSelected()){
+            //set selected overlay image (white dot over the image)
             holder.isSelectedRadio.setVisibility(View.VISIBLE);
         } else {
             holder.isSelectedRadio.setVisibility(View.GONE);
@@ -56,13 +59,11 @@ public class ThemeChangerAdapter extends RecyclerView.Adapter<ThemeChangerAdapte
                 images.get(selectedPosition).setSelected(false);
                 notifyItemChanged(selectedPosition);
 
+                //updating new selection (also the static field for selected theme in HomePage)
                 selectedPosition = position;
                 images.get(position).setSelected(true);
-                ListActivity.setBackground(images.get(position).getImageRes());
-                holder.isSelectedRadio.setVisibility(View.VISIBLE);
+                todo_HomePage.setSelectedTheme(images.get(position).getImageRes());
                 notifyItemChanged(selectedPosition);
-
-                updateThemeInDatabase(position);
             }
         });
     }
@@ -70,28 +71,6 @@ public class ThemeChangerAdapter extends RecyclerView.Adapter<ThemeChangerAdapte
     @Override
     public int getItemCount() {
         return images.size();
-    }
-
-    public int selectCurrentTheme(int themeRes){
-        for(int i = 0; i < images.size(); i++){
-            if(images.get(i).getImageRes() == themeRes){
-                images.get(i).setSelected(true);
-                selectedPosition = i;
-                notifyItemChanged(i);
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    public void setID(int ID){
-        this.ID = ID;
-    }
-
-    private void updateThemeInDatabase(int position){
-        String selectedTheme = context.getResources().getResourceName(images.get(position).getImageRes());
-        DatabaseManager db = new DatabaseManager(context);
-        db.updateTheme(ID, selectedTheme);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

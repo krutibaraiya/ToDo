@@ -22,22 +22,22 @@ import com.github.lguipeng.library.animcheckbox.AnimCheckBox;
 import java.util.Calendar;
 import java.util.List;
 
-import AlarmHelpers.AlarmReceiver;
-import Database.DatabaseManager;
-import Objects.TaskObject;
+import AlarmHelpers.todo_AlarmReceiver;
+import Database.DatabaseManagerTodo;
+import Objects.todo_TaskObject;
 
-public class ListItemTaskAdapter extends RecyclerView.Adapter<ListItemTaskAdapter.ViewHolder> {
+public class todo_ListItemTaskAdapter extends RecyclerView.Adapter<todo_ListItemTaskAdapter.ViewHolder> {
 
     Context context;
     int resource;
-    List<TaskObject> taskObjectList;
-    DatabaseManager db;
+    List<todo_TaskObject> taskObjectList;
+    DatabaseManagerTodo db;
 
-    public ListItemTaskAdapter(@NonNull Context context, int resource, List<TaskObject> taskObjectList) {
+    public todo_ListItemTaskAdapter(@NonNull Context context, int resource, List<todo_TaskObject> taskObjectList) {
         this.context = context;
         this.resource = resource;
         this.taskObjectList = taskObjectList;
-        db = new DatabaseManager(context);
+        db = new DatabaseManagerTodo(context);
     }
 
     @NonNull
@@ -49,7 +49,7 @@ public class ListItemTaskAdapter extends RecyclerView.Adapter<ListItemTaskAdapte
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
 
-        final TaskObject task = taskObjectList.get(position);
+        final todo_TaskObject task = taskObjectList.get(position);
 
         holder.taskDescription.setText(task.getTaskDescription());
 
@@ -121,7 +121,7 @@ public class ListItemTaskAdapter extends RecyclerView.Adapter<ListItemTaskAdapte
     }
 
     private void edit_task_popup(final int position){
-        TaskObject task = taskObjectList.get(position);
+        todo_TaskObject task = taskObjectList.get(position);
 
         View view_add_task = LayoutInflater.from(context).inflate(R.layout.popup_add_todo_task, null);
 
@@ -188,7 +188,7 @@ public class ListItemTaskAdapter extends RecyclerView.Adapter<ListItemTaskAdapte
             String date = dateTime[0];
             String time = dateTime[1];
 
-            TaskObject task = taskObjectList.get(position);
+            todo_TaskObject task = taskObjectList.get(position);
             task.setTaskDescription(taskDescription);
             task.setHasDueDate(!"0".equals(date));
 
@@ -210,11 +210,11 @@ public class ListItemTaskAdapter extends RecyclerView.Adapter<ListItemTaskAdapte
                 task.setTime("0");
             }
 
-            DatabaseManager db = new DatabaseManager(context);
+            DatabaseManagerTodo db = new DatabaseManagerTodo(context);
             db.UpdateTaskInDatabase(task.getID(), taskDescription, date, time, task.getCalendar());
 
 
-            AlarmReceiver alarmReceiver = new AlarmReceiver();
+            todo_AlarmReceiver alarmReceiver = new todo_AlarmReceiver();
             alarmReceiver.cancelAlarm(context, task.getID());
             db.hasBeenNotified(task.getID());
 

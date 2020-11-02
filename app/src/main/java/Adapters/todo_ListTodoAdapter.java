@@ -13,24 +13,24 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.todo.DueToday;
-import com.example.todo.DueTomorrow;
-import com.example.todo.ImportantTasks;
-import com.example.todo.ListActivity;
+import com.example.todo.todo_DueToday;
+import com.example.todo.todo_DueTomorrow;
+import com.example.todo.todo_ImportantTasks;
+import com.example.todo.todo_ListActivity;
 import com.example.todo.R;
 
 import java.util.List;
 
-import Database.BaseDatabase;
-import Objects.ListObject;
+import Database.todo_BaseDatabase;
+import Objects.todo_ListObject;
 
-public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHolder> {
+public class todo_ListTodoAdapter extends RecyclerView.Adapter<todo_ListTodoAdapter.ViewHolder> {
 
     private Context context;
     private int resource;
-    private List<ListObject> list;
+    private List<todo_ListObject> list;
 
-    public ListTodoAdapter(Context context, int resource, List<ListObject> list) {
+    public todo_ListTodoAdapter(Context context, int resource, List<todo_ListObject> list) {
         this.context = context;
         this.resource = resource;
         this.list = list;
@@ -51,7 +51,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
             public void onClick(View v) {
                 if (list.get(position).getId() == -200) {
                     //Today Activity Intent
-                    Intent intent = new Intent(context, DueToday.class);
+                    Intent intent = new Intent(context, todo_DueToday.class);
                     Activity activity = (Activity) context;
                     activity.startActivity(intent);
                     activity.overridePendingTransition(R.anim.to_list_activity, R.anim.to_list_activity);
@@ -59,7 +59,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
 
                 else if (list.get(position).getId() == -400) {
                     //Tomorrow Activity Intent
-                    Intent intent = new Intent(context, DueTomorrow.class);
+                    Intent intent = new Intent(context, todo_DueTomorrow.class);
                     Activity activity = (Activity) context;
                     activity.startActivity(intent);
                     activity.overridePendingTransition(R.anim.to_list_activity, R.anim.to_list_activity);
@@ -67,7 +67,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
 
                 else if (list.get(position).getId() == -600) {
                     //Important Activity Intent
-                    Intent intent = new Intent(context, ImportantTasks.class);
+                    Intent intent = new Intent(context, todo_ImportantTasks.class);
                     Activity activity = (Activity) context;
                     activity.startActivity(intent);
                     activity.overridePendingTransition(R.anim.to_list_activity, R.anim.to_list_activity);
@@ -75,9 +75,9 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
 
                 else {
                     Activity activity = (Activity) context;
-                    Intent intent = new Intent(context, ListActivity.class);
+                    Intent intent = new Intent(context, todo_ListActivity.class);
                     intent.putExtra("title", list.get(position).getName());
-                    intent.putExtra(BaseDatabase.TASKS_PARENT_ID, list.get(position).getId());
+                    intent.putExtra(todo_BaseDatabase.TASKS_PARENT_ID, list.get(position).getId());
                     activity.startActivity(intent);
                     activity.overridePendingTransition(R.anim.to_list_activity, R.anim.to_list_activity);
                 }
@@ -92,7 +92,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
             }
         });
 
-        ListObject item = list.get(position);
+        todo_ListObject item = list.get(position);
 
         holder.icon.setImageResource(item.getIcon());
         holder.name.setText(item.getName());
@@ -110,7 +110,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
         }
     }
 
-    private void expandLayout(ListObject item, ViewHolder holder) {
+    private void expandLayout(todo_ListObject item, ViewHolder holder) {
 
         if (!item.isExpanded()) {
             item.setExpanded(true);
@@ -129,7 +129,7 @@ public class ListTodoAdapter extends RecyclerView.Adapter<ListTodoAdapter.ViewHo
 
     }
 
-    private void initSubList(ListObject item, RecyclerView recyclerView) {
+    private void initSubList(todo_ListObject item, RecyclerView recyclerView) {
         //load Todo Lists of the group from database and set adapter
     }
 

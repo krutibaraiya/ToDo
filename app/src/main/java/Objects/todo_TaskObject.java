@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class TaskObject {
+public class todo_TaskObject {
 
     int ID;
     boolean isTaskFinished;
@@ -13,7 +13,7 @@ public class TaskObject {
     int day, month, year, hour, minute;     //month is indexed from 1   i.e. 1-12
     String taskDescription;
 
-    public TaskObject(String taskDescription, boolean isTaskFinished, boolean hasDueDate){
+    public todo_TaskObject(String taskDescription, boolean isTaskFinished, boolean hasDueDate){
         this.taskDescription = taskDescription;
         this.isTaskFinished = isTaskFinished;
         this.hasDueDate = hasDueDate;
