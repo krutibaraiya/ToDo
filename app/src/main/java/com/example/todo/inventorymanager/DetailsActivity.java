@@ -227,6 +227,11 @@ public class DetailsActivity extends AppCompatActivity {
                 //delete all data
                 showDeleteConfirmationDialog(0);
                 return true;
+            // Editing
+            case R.id.action_share:
+                //share item
+                shareIt();
+                // Editing
         }
         return super.onOptionsItemSelected(item);
     }
@@ -375,9 +380,9 @@ public class DetailsActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
             return;
         }
         openImageSelector();
@@ -394,6 +399,27 @@ public class DetailsActivity extends AppCompatActivity {
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
+
+    // Editing
+    private void shareIt() {
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String name = nameEdit.getText().toString().trim();
+        String price = priceEdit.getText().toString().trim();
+        int quan = Integer.parseInt(quantityEdit.getText().toString().trim());
+        String sname = supplierNameEdit.getText().toString().trim();
+        String sphone = supplierPhoneEdit.getText().toString().trim();
+        String semail = supplierEmailEdit.getText().toString().trim();
+//        String uri = actualUri.toString();
+        String shareBody = "Item details- "+ "\n\n" + "Name: " + name + "\n"
+                + "Price: " + price + "\n" + "Quantity: " + quan + "\n\n"
+                + "Supplier name: " + sname + "\n" + "Supplier Phone no.: " + sphone + "\n"
+                + "Suppler email: " + semail + "\n";
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Current Availability of " + name);
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+    }
+    // Editing
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -416,6 +442,7 @@ public class DetailsActivity extends AppCompatActivity {
         // If the request code seen here doesn't match, it's the response to some other intent,
         // and the below code shouldn't run at all.
 
+        super.onActivityResult(requestCode, resultCode, resultData);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
             // The document selected by the user won't be returned in the intent.
             // Instead, a URI to that document will be contained in the return intent
